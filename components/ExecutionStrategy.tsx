@@ -68,7 +68,7 @@ const ExecutionStrategy: React.FC<ExecutionStrategyProps> = ({ resources, budget
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* LEFT COLUMN: Hardware & Budget (4 cols) */}
-        <div className="lg:col-span-4 space-y-8">
+        <div className="lg:col-span-4 h-[600px] overflow-y-auto custom-scrollbar space-y-8 pr-2">
             {/* 1. Hardware */}
             <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
             <div className="flex items-center space-x-3 mb-5">
@@ -162,7 +162,7 @@ const ExecutionStrategy: React.FC<ExecutionStrategyProps> = ({ resources, budget
         </div>
 
         {/* MIDDLE COLUMN: Team Roles (4 cols) */}
-        <div className="lg:col-span-4 bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col h-full">
+        <div className="lg:col-span-4 bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col h-[600px]">
             <div className="flex items-center space-x-3 mb-5">
             <div className="p-2.5 bg-indigo-50 rounded-lg text-indigo-600">
                 <Users className="w-6 h-6" />
@@ -170,7 +170,7 @@ const ExecutionStrategy: React.FC<ExecutionStrategyProps> = ({ resources, budget
             <h3 className="font-bold text-slate-800 text-lg">Squad Roles ({team.length})</h3>
             </div>
 
-            <div className="flex-grow space-y-4 overflow-y-auto custom-scrollbar max-h-[600px]">
+            <div className="flex-grow space-y-4 overflow-y-auto custom-scrollbar">
             {team.map((member, idx) => (
                 <div key={idx} className="group relative bg-slate-50 rounded-xl p-4 hover:bg-white hover:shadow-lg transition-all duration-300 border border-transparent hover:border-indigo-100 cursor-default">
                 <div className="flex justify-between items-start mb-2">
@@ -232,7 +232,7 @@ const ExecutionStrategy: React.FC<ExecutionStrategyProps> = ({ resources, budget
         </div>
 
         {/* RIGHT COLUMN: Folder Structure (4 cols) */}
-        <div className="lg:col-span-4 h-full">
+        <div className="lg:col-span-4 h-[600px]">
             <FolderTree structure={folderStructure} onCopy={handleCopyStructure} />
         </div>
 

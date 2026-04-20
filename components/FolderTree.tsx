@@ -84,7 +84,7 @@ const FolderTree: React.FC<FolderTreeProps> = ({ structure, onCopy }) => {
           {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
         </button>
       </div>
-      <div className="p-2 overflow-y-auto max-h-[400px] custom-scrollbar">
+      <div className="p-2 overflow-y-auto flex-grow custom-scrollbar">
         {structure.map((node, idx) => (
           <TreeNode key={idx} node={node} />
         ))}

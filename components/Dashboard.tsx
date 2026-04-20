@@ -41,31 +41,35 @@ const Dashboard: React.FC<DashboardProps> = ({ userId, onSelectProject, onNewPro
   };
 
   const deleteProject = async (id: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // CRITICAL: Stop the click from bubbling to the card div
+    e.stopPropagation();
     
     if (!window.confirm("Are you sure you want to delete this project? This cannot be undone.")) return;
 
-    // 1. Optimistic Update (Remove from UI immediately for speed)
+    // Save previous state for rollback
     const prevProjects = [...projects];
+    // Optimistic Update
     setProjects(prev => prev.filter(p => p.id !== id));
 
     try {
-      // 2. Delete from Supabase
-      const { error } = await supabase.from('projects').delete().eq('id', id);
+      console.log("Attempting to delete project:", id);
+      const { error, status } = await supabase
+        .from('projects')
+        .delete()
+        .eq('id', id);
       
-      if (error) {
-        // Revert on failure
-        setProjects(prevProjects);
-        throw error;
-      }
+      if (error) throw error;
       
-      // 3. Show Success Toast
+      // If status is 204 or 200, it succeeded
+      console.log("Delete response status:", status);
+      
       setDeleteSuccess(true);
       setTimeout(() => setDeleteSuccess(false), 3000);
       
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error deleting project:", err);
-      alert("Failed to delete project from server. Please check network connection.");
+      // Revert optimistic update
+      setProjects(prevProjects);
+      alert(`Failed to delete project: ${err.message || 'Unknown error'}. Please check your Supabase RLS policies.`);
     }
   };
 

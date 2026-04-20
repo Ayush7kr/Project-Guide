@@ -333,9 +333,14 @@ const ResultsPage: React.FC<ResultsPageProps> = ({
 
   // --- GitHub Inspiration Logic (Refined) ---
   const primaryTech = activeStrategy.tools[0]?.name || 'Web';
-  // Simplified query: "React E-Commerce template" results in better matches than complex queries
-  const safeCategory = blueprint.projectDomain.replace(/[^\w\s-]/gi, '').trim(); 
-  const githubQuery = `${primaryTech} ${safeCategory} template`.replace(/\s+/g, '+');
+  // Extract keywords: first 3 words of the project name, filtered for length
+  const projectKeywords = currentProjectName
+    .split(/[:\s-]+/) // Split by colon, space, or hyphen
+    .filter(word => word.length > 2)
+    .slice(0, 3)
+    .join(' ');
+  
+  const githubQuery = encodeURIComponent(`${primaryTech} ${projectKeywords} boilerplate`);
   const githubInspirationUrl = `https://github.com/search?q=${githubQuery}&type=repositories&s=stars&o=desc`;
 
   return (

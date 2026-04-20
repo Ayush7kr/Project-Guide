@@ -2,7 +2,7 @@
 import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { UserInput, ProjectBlueprint, StarterKit, ProjectStrategy, ChatMessage, DeepResearchReport } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyCaSwc3g4HX6vzUV3Ibaoq0K6ylBwIQjHk" });
 
 // --- Schemas ---
 
@@ -352,7 +352,7 @@ export const generateBlueprint = async (input: UserInput): Promise<ProjectBluepr
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-pro-preview",
+      model: "gemini-2.0-flash-lite-preview-02-05",
       contents: prompt,
       config: {
         responseMimeType: "application/json",
@@ -409,7 +409,7 @@ export const generateStarterKit = async (blueprint: ProjectBlueprint, strategy: 
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.0-flash-lite-preview-02-05",
       contents: prompt,
       config: {
         responseMimeType: "application/json",
@@ -442,7 +442,7 @@ export const generateDeepResearch = async (projectName: string, projectDomain: s
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.0-flash-lite-preview-02-05",
       contents: prompt,
       config: {
         responseMimeType: "application/json",
@@ -468,7 +468,7 @@ export const regenerateProjectName = async (description: string, currentName: st
   
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.0-flash-lite-preview-02-05",
       contents: prompt,
       config: {
         responseMimeType: "application/json",
