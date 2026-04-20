@@ -16,9 +16,16 @@ const RiskRadar: React.FC<RiskRadarProps> = ({ risks }) => {
       
       <div className="grid gap-4 md:grid-cols-3">
         {risks.map((risk, idx) => (
-          <div key={idx} className="bg-white rounded-xl p-4 shadow-sm border border-amber-100/50 hover:border-amber-200 transition-colors relative overflow-hidden group">
+          <div 
+            key={idx} 
+            className={`rounded-xl p-4 shadow-sm border transition-colors relative overflow-hidden group ${
+               risk.severity === 'High' 
+               ? 'bg-gradient-to-br from-red-50 to-red-100/50 border-red-100 hover:border-red-200' 
+               : 'bg-gradient-to-br from-amber-50 to-amber-100/50 border-amber-100 hover:border-amber-200'
+            }`}
+          >
             <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                <ShieldAlert className="w-12 h-12 text-amber-500" />
+                <ShieldAlert className={`w-12 h-12 ${risk.severity === 'High' ? 'text-red-500' : 'text-amber-500'}`} />
             </div>
             
             <div className="relative z-10">
@@ -33,8 +40,8 @@ const RiskRadar: React.FC<RiskRadarProps> = ({ risks }) => {
               <h4 className="font-bold text-slate-800 mb-1 leading-tight">{risk.title}</h4>
               <p className="text-xs text-slate-500 mb-3">{risk.description}</p>
               
-              <div className="pt-3 border-t border-slate-50">
-                <p className="text-[10px] font-semibold text-amber-600 uppercase mb-1">Mitigation Strategy</p>
+              <div className="pt-3 border-t border-slate-200/50">
+                <p className={`text-[10px] font-semibold uppercase mb-1 ${risk.severity === 'High' ? 'text-red-600' : 'text-amber-600'}`}>Mitigation Strategy</p>
                 <p className="text-xs text-slate-700 leading-snug">{risk.mitigation}</p>
               </div>
             </div>

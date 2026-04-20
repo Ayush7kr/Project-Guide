@@ -1,3 +1,4 @@
+
 export enum DifficultyLevel {
   Beginner = 'Beginner',
   Intermediate = 'Intermediate',
@@ -10,6 +11,7 @@ export interface Tool {
   reason: string;
   difficulty: DifficultyLevel;
   isStudentFriendly: boolean;
+  marketInsight: string; // New: Job market demand metric
   docsUrl?: string;     
   tutorialUrl?: string; 
 }
@@ -29,11 +31,16 @@ export interface BudgetDetail {
   inStudentPack: boolean;
 }
 
+export interface Skill {
+  name: string;
+  demand: string;
+}
+
 export interface TeamRole {
   title: string;
   focus: string;
   keyTasks: string[];
-  skills: string[];
+  skills: Skill[];
   ownedFiles: string[]; 
 }
 
@@ -50,6 +57,11 @@ export interface ProjectRisk {
   mitigation: string;
 }
 
+export interface TradeOff {
+  toolName: string;
+  reasonExcluded: string;
+}
+
 export interface ProjectStrategy {
   strategyName: string; 
   description: string;
@@ -58,6 +70,7 @@ export interface ProjectStrategy {
   budgetBreakdown: BudgetDetail[];
   teamRoles: TeamRole[]; 
   folderStructure: FileNode[];
+  tradeOffs: TradeOff[];
 }
 
 // --- Success Path ---
@@ -81,6 +94,7 @@ export interface RoadmapNode {
   concepts: string[];
   resources: LearningResource[];
   estimatedEffort: string;
+  completed?: boolean;
 }
 
 export interface RoadmapPhase {
@@ -95,13 +109,41 @@ export interface CodeFile {
   language: string;
   content: string;
   description: string;
-  buildSteps: string[]; // New: "How to Build This" steps
+  buildSteps: string[];
+}
+
+export interface CommonError {
+  error: string;
+  fix: string;
 }
 
 export interface StarterKit {
-  installCommand: string; // New: e.g. "npm install react"
-  setupScript: string;    // New: shell script to create folders
+  installCommand: string;
+  setupScript: string;
+  readme: string;
+  dependencies: string;
+  dependencyFileName: string;
+  envFile: string; // New: .env template
+  commonErrors: CommonError[]; // New: Debugging tips
   files: CodeFile[];
+}
+
+// --- Deep Research ---
+
+export interface DeepResearchReport {
+  competitors: Array<{
+    name: string;
+    description: string;
+  }>;
+  technicalEdge: Array<{
+    feature: string;
+    whyItMatters: string;
+  }>;
+  monetizationStrategies: Array<{
+    model: string;
+    description: string;
+  }>;
+  summary: string;
 }
 
 export interface ProjectBlueprint {
@@ -110,7 +152,7 @@ export interface ProjectBlueprint {
   complexitySummary: string;
   estimatedDuration: string;
   resumeTip: string; 
-  dataFlow: string[]; // New: ["User", "React", "API"]
+  dataFlow: string[]; 
   risks: ProjectRisk[];
   strategies: {
     recommended: ProjectStrategy;
@@ -118,13 +160,25 @@ export interface ProjectBlueprint {
   };
   successPath: RoadmapPhase[];
   simpleRoadmapFallback: RoadmapStep[];
+  deepResearch?: DeepResearchReport; // Optional cached research
+}
+
+export interface SavedProject {
+  id: string;
+  created_at: string;
+  name: string;
+  description: string;
+  blueprint_data: ProjectBlueprint;
+  user_id: string;
 }
 
 export interface UserInput {
   description: string;
   projectType: string;
+  customProjectType?: string; // New: For 'Other' input
   difficulty: string;
   timeConstraint: string;
+  customTimeConstraint?: string; // New: For 'Other' input
   teamSize: number;       
   projectGoal: 'Deep Learning' | 'Rapid MVP'; 
 }

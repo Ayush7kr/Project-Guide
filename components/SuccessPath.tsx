@@ -13,14 +13,19 @@ import {
   Trophy,
   Code2,
   Rocket,
-  Layout
+  Layout,
+  Loader2
 } from 'lucide-react';
 
 interface SuccessPathProps {
   phases: RoadmapPhase[];
+  projectName: string;
+  onToggleNode: (nodeId: string) => void;
+  savingNodeId?: string | null;
 }
 
-const PhaseIcon = ({ name }: { name: string }) => {
+const PhaseIcon = ({ name }: { name?: string }) => {
+  if (!name) return <Trophy className="w-6 h-6" />;
   const lower = name.toLowerCase();
   if (lower.includes('knowledge')) return <BookOpen className="w-6 h-6" />;
   if (lower.includes('setup') || lower.includes('env')) return <Layout className="w-6 h-6" />;
@@ -29,19 +34,25 @@ const PhaseIcon = ({ name }: { name: string }) => {
   return <Trophy className="w-6 h-6" />;
 };
 
-const SuccessPath: React.FC<SuccessPathProps> = ({ phases }) => {
-  const [completedNodes, setCompletedNodes] = useState<Set<string>>(new Set());
+const SuccessPath: React.FC<SuccessPathProps> = ({ phases, projectName, onToggleNode, savingNodeId }) => {
   const [selectedNode, setSelectedNode] = useState<RoadmapNode | null>(null);
 
-  const toggleComplete = (id: string, e: React.MouseEvent) => {
+  const handleToggle = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    const newSet = new Set(completedNodes);
-    if (newSet.has(id)) {
-      newSet.delete(id);
-    } else {
-      newSet.add(id);
+    if (onToggleNode && savingNodeId !== id) {
+      onToggleNode(id);
     }
-    setCompletedNodes(newSet);
+  };
+
+  // Helper to fix URLs if AI returns broken YouTube/Google links
+  const getSafeUrl = (url: string, type: 'video' | 'doc', title: string) => {
+    if (type === 'video') {
+       // If it's already a search query, return it
+       if (url.includes('results?search_query=')) return url;
+       // Otherwise, force a search query to avoid dead video IDs
+       return `https://www.youtube.com/results?search_query=${encodeURIComponent(title + ' tutorial 2025')}`;
+    }
+    return url;
   };
 
   return (
@@ -80,8 +91,9 @@ const SuccessPath: React.FC<SuccessPathProps> = ({ phases }) => {
               {/* Nodes */}
               <div className="space-y-8">
                 {phase.nodes.map((node, nodeIdx) => {
-                  const isCompleted = completedNodes.has(node.id);
+                  const isCompleted = !!node.completed;
                   const isLeft = nodeIdx % 2 === 0;
+                  const isSaving = savingNodeId === node.id;
 
                   return (
                     <motion.div 
@@ -106,11 +118,14 @@ const SuccessPath: React.FC<SuccessPathProps> = ({ phases }) => {
                         >
                            <div className="flex justify-between items-start mb-3">
                               <h4 className={`text-lg font-bold ${isCompleted ? 'text-teal-800' : 'text-slate-800'}`}>{node.title}</h4>
-                              <button onClick={(e) => toggleComplete(node.id, e)}>
-                                 {isCompleted 
-                                   ? <CheckCircle2 className="w-6 h-6 text-teal-500" /> 
-                                   : <Circle className="w-6 h-6 text-slate-300 hover:text-indigo-400" />
-                                 }
+                              <button onClick={(e) => handleToggle(node.id, e)} disabled={isSaving}>
+                                 {isSaving ? (
+                                    <Loader2 className="w-6 h-6 text-teal-600 animate-spin" />
+                                 ) : isCompleted ? (
+                                    <CheckCircle2 className="w-6 h-6 text-teal-500" /> 
+                                 ) : (
+                                    <Circle className="w-6 h-6 text-slate-300 hover:text-indigo-400" />
+                                 )}
                               </button>
                            </div>
                            <p className="text-base text-slate-600 line-clamp-2 leading-relaxed">{node.description}</p>
@@ -144,11 +159,14 @@ const SuccessPath: React.FC<SuccessPathProps> = ({ phases }) => {
                          >
                             <div className="flex justify-between items-start mb-2">
                                <h4 className={`text-lg font-bold ${isCompleted ? 'text-teal-800' : 'text-slate-800'}`}>{node.title}</h4>
-                               <button onClick={(e) => toggleComplete(node.id, e)} className="p-1">
-                                 {isCompleted 
-                                   ? <CheckCircle2 className="w-6 h-6 text-teal-500" /> 
-                                   : <Circle className="w-6 h-6 text-slate-300" />
-                                 }
+                               <button onClick={(e) => handleToggle(node.id, e)} className="p-1" disabled={isSaving}>
+                                 {isSaving ? (
+                                    <Loader2 className="w-6 h-6 text-teal-600 animate-spin" />
+                                 ) : isCompleted ? (
+                                    <CheckCircle2 className="w-6 h-6 text-teal-500" /> 
+                                 ) : (
+                                    <Circle className="w-6 h-6 text-slate-300" />
+                                 )}
                                </button>
                             </div>
                             <p className="text-sm text-slate-500 mt-1 line-clamp-2 leading-relaxed">{node.description}</p>
@@ -218,15 +236,18 @@ const SuccessPath: React.FC<SuccessPathProps> = ({ phases }) => {
 
                   {/* Curated Hub */}
                   <div>
-                     <h4 className="font-bold text-slate-800 mb-5 flex items-center text-lg">
+                     <h4 className="font-bold text-slate-800 mb-2 flex items-center text-lg">
                         <PlayCircle className="w-5 h-5 mr-3 text-red-500" />
                         Curated Learning Hub
                      </h4>
+                     <p className="text-xs text-slate-400 mb-4 italic">
+                        Links open a curated search to provide the most recent and working tutorials.
+                     </p>
                      <div className="space-y-4">
                         {selectedNode.resources.map((res, idx) => (
                            <a 
                              key={idx} 
-                             href={res.url} 
+                             href={getSafeUrl(res.url, res.type, res.title)} 
                              target="_blank" 
                              rel="noopener noreferrer"
                              className="flex items-center p-4 rounded-xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 transition-all group shadow-sm"
@@ -248,16 +269,21 @@ const SuccessPath: React.FC<SuccessPathProps> = ({ phases }) => {
 
                   <button 
                     onClick={(e) => {
-                       if (selectedNode) toggleComplete(selectedNode.id, e);
-                       setSelectedNode(null);
+                       if (selectedNode) handleToggle(selectedNode.id, e);
                     }}
+                    disabled={savingNodeId === selectedNode.id}
                     className={`w-full py-4 rounded-xl font-bold flex items-center justify-center space-x-2 transition-all text-lg shadow-lg ${
-                       completedNodes.has(selectedNode.id)
+                       selectedNode.completed
                        ? 'bg-slate-100 text-slate-500 hover:bg-slate-200'
                        : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200'
                     }`}
                   >
-                     {completedNodes.has(selectedNode.id) ? (
+                     {savingNodeId === selectedNode.id ? (
+                        <>
+                           <Loader2 className="w-6 h-6 animate-spin" />
+                           <span>Saving...</span>
+                        </>
+                     ) : selectedNode.completed ? (
                         <>
                            <CheckCircle2 className="w-6 h-6" />
                            <span>Marked as Complete</span>

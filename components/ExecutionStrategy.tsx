@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResourceAnalysis, BudgetDetail, TeamRole, FileNode } from '../types';
-import { HardDrive, Banknote, Users, CheckCircle, CloudLightning, GraduationCap, Layers, FileCode, ArrowRight } from 'lucide-react';
+import { HardDrive, Banknote, Users, CheckCircle, CloudLightning, GraduationCap, Layers, FileCode, ArrowRight, TrendingUp } from 'lucide-react';
 import FolderTree from './FolderTree';
 
 interface ExecutionStrategyProps {
@@ -9,7 +9,7 @@ interface ExecutionStrategyProps {
   team: TeamRole[];
   folderStructure: FileNode[];
   strategyName: string;
-  dataFlow?: string[]; // Added prop
+  dataFlow?: string[]; 
 }
 
 const ExecutionStrategy: React.FC<ExecutionStrategyProps> = ({ resources, budget, team, folderStructure, strategyName, dataFlow }) => {
@@ -19,6 +19,15 @@ const ExecutionStrategy: React.FC<ExecutionStrategyProps> = ({ resources, budget
   const handleCopyStructure = () => {
     const text = JSON.stringify(folderStructure, null, 2);
     navigator.clipboard.writeText(text);
+  };
+
+  const getDemandColor = (demand?: string) => {
+    if (!demand) return 'bg-slate-100 text-slate-700';
+    const d = demand.toLowerCase();
+    if (d.includes('high') || d.includes('critical')) return 'bg-red-100 text-red-700';
+    if (d.includes('rising') || d.includes('trend')) return 'bg-teal-100 text-teal-700';
+    if (d.includes('niche')) return 'bg-purple-100 text-purple-700';
+    return 'bg-slate-100 text-slate-700';
   };
 
   return (
@@ -184,6 +193,27 @@ const ExecutionStrategy: React.FC<ExecutionStrategyProps> = ({ resources, budget
                                 </li>
                             ))}
                         </ul>
+                    </div>
+                    <div>
+                         <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Skills & Market Demand</span>
+                         <div className="flex flex-wrap gap-1.5 mt-2">
+                            {member.skills.map((skill: any, sIdx) => {
+                                // Safe handling for legacy string skills vs new object skills
+                                const skillName = typeof skill === 'string' ? skill : skill?.name;
+                                const skillDemand = typeof skill === 'string' ? 'Standard' : (skill?.demand || 'Standard');
+                                
+                                if (!skillName) return null;
+
+                                return (
+                                    <div key={sIdx} className="flex items-center bg-white border border-slate-200 rounded-md overflow-hidden shadow-sm">
+                                    <span className="px-1.5 py-0.5 text-[10px] font-bold text-slate-700">{skillName}</span>
+                                    <span className={`px-1.5 py-0.5 text-[9px] font-bold uppercase ${getDemandColor(skillDemand)}`}>
+                                        {skillDemand}
+                                    </span>
+                                    </div>
+                                );
+                            })}
+                         </div>
                     </div>
                     <div>
                          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Owns Files</span>
