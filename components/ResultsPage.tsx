@@ -332,15 +332,17 @@ const ResultsPage: React.FC<ResultsPageProps> = ({
   };
 
   // --- GitHub Inspiration Logic (Refined) ---
-  const primaryTech = activeStrategy.tools[0]?.name || 'Web';
-  // Extract keywords: first 3 words of the project name, filtered for length
-  const projectKeywords = currentProjectName
-    .split(/[:\s-]+/) // Split by colon, space, or hyphen
-    .filter(word => word.length > 2)
-    .slice(0, 3)
+  // Use top 2 tools + project domain for a broad, effective search
+  const topTools = activeStrategy.tools
+    .slice(0, 2)
+    .map(t => t.name)
     .join(' ');
-  
-  const githubQuery = encodeURIComponent(`${primaryTech} ${projectKeywords} boilerplate`);
+  // Use the project domain (e.g. "fintech", "e-commerce") as context
+  const domainKeyword = blueprint.projectDomain || '';
+  // Build a concise query that actually returns results on GitHub
+  const githubQuery = encodeURIComponent(
+    `${topTools} ${domainKeyword}`.trim()
+  );
   const githubInspirationUrl = `https://github.com/search?q=${githubQuery}&type=repositories&s=stars&o=desc`;
 
   return (
