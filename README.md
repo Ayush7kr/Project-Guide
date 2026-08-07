@@ -534,7 +534,7 @@ This project is licensed under the **MIT License** — feel free to use it to bu
 
 <br/>
 
-**Built with ❤️ by [Ayush](https://github.com/Ayush7kr)**
+**Built by [Ayush](https://github.com/Ayush7kr)**
 
 _If ToolWise helped you architect something awesome, give it a_ ⭐
 
